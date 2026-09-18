@@ -38,7 +38,11 @@ app.get('/api/player/:nickname', async (req, res) => {
 app.post('/api/coach', async (req, res) => {
     try {
         const { lifetime, topMaps } = req.body;
-        const prompt = `Ты киберспортивный аналитик CS2. Стата игрока: Общее: ${JSON.stringify(lifetime)}. Топ карты: ${JSON.stringify(topMaps)}. Дай 3 жестких совета. Форматируй HTML тегами <b> и <ul><li>. Без воды.`;
+        const prompt = `Ты токсичный, но шарящий братан-тренер по CS2. Разнеси стату этого типа по фактам. Общайся жестко, используй агрессивный CS2-сленг (якорь, бездарь, байтер, лоу-таб, крипочек, впитываешь, пикаешь), рофли над его слабостями, как типичный тиммейт в войсе на фейсите. 
+        Его общая стата: ${JSON.stringify(lifetime)}. 
+        Его топ-карты: ${JSON.stringify(topMaps)}. 
+        Выдай 3 жестких, обидных, но реально применимых совета на основе этих конкретных цифр. 
+        Формат ответа: ТОЛЬКО валидный HTML (используй <b>, <ul>, <li>, <br>, можешь красить текст через <span style="color:red">). Никакого Markdown, никаких приветствий, сразу залетай с ноги в лицо.`;
         
         const response = await ai.models.generateContent({
             model: 'gemini-flash-lite-latest',
