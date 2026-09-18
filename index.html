@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EloPilot | Max Stats</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- АНИМИРОВАННЫЙ ФОН AURORA -->
+    <div class="bg-animation">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="container">
+        <!-- 1. ПОИСК -->
+        <div id="search-section" class="glass-panel active">
+            <div class="logo">EloPilot ✈️</div>
+            <h1>Глубокий анализ</h1>
+            <p class="search-subtitle">Собери свой scouting report по FACEIT: форма, импакт, карты и последние матчи в одном экране.</p>
+            <div class="input-group">
+                <input type="text" id="nickname-input" placeholder="Никнейм на FACEIT..." autocomplete="off">
+                <button id="search-btn">Анализ</button>
+            </div>
+            <div id="recent-searches" class="recent-searches hidden"></div>
+            <div id="error-msg" class="error"></div>
+        </div>
+
+        <!-- 2. ДАШБОРД -->
+        <div id="stats-section" class="hidden">
+            <button id="back-btn" class="icon-btn">← Новый поиск</button>
+            <div class="report-bar">
+                <div>
+                    <span class="history-eyebrow">SCOUTING REPORT / CS2</span>
+                    <h1 id="report-title">Профиль игрока</h1>
+                    <p>Срез формы и импакта на основе последних данных FACEIT.</p>
+                </div>
+                <div class="report-status"><i></i><span>LIVE DATA</span></div>
+            </div>
+            <div class="dashboard-grid">
+                <!-- Левая колонка -->
+                <div class="left-col">
+                    <!-- ОБНОВЛЕННАЯ ПРЕМИУМ-КАРТОЧКА ПРОФИЛЯ -->
+                    <div class="glass-panel profile-card premium-card">
+                        <!-- Крутящийся фон внутри карточки -->
+                        <div class="premium-card-bg"></div> 
+                        
+                        <div class="avatar-container">
+                            <img id="player-avatar" src="" alt="Avatar" class="premium-avatar">
+                            <div class="avatar-glow"></div>
+                        </div>
+                        
+                        <h2 id="player-name" class="premium-name">-</h2>
+
+                        <div class="elo-wrap">
+                            <span class="elo-text">ELO: <strong id="player-elo">N/A</strong></span>
+                        </div>
+
+                        <div class="profile-meta">
+                            <span id="player-registered">FACEIT с --</span>
+                            <a id="faceit-profile-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="Открыть профиль FACEIT" title="Открыть профиль FACEIT">↗</a>
+                        </div>
+                        
+                        <!-- Раздельные, крупные бейджи для Уровня и ELO -->
+                        <div class="premium-badges">
+                           <div class="badge-level">
+                                <!-- Новый SVG виджет уровня -->
+                                <div class="faceit-level-widget hidden" id="faceit-level-widget">
+                                    <svg viewBox="0 0 100 100">
+                                        <circle class="lvl-bg" cx="50" cy="50" r="42"></circle>
+                                        <circle class="lvl-progress" id="lvl-progress" cx="50" cy="50" r="42"></circle>
+                                    </svg>
+                                    <div class="lvl-number" id="player-level-text">0</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="rating-divider"></div>
+
+                        <!-- Прокачанный блок Pilot Rating 3.0 -->
+                        <div class="rating-widget premium-rating">
+                            <div class="rating-title">Pilot Rating 3.0</div>
+                            <div class="rating-circle-container">
+                                <svg class="rating-svg" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="40" class="circle-bg"></circle>
+                                    <circle cx="50" cy="50" r="40" class="circle-progress" id="rating-progress"></circle>
+                                </svg>
+                                <div class="rating-value" id="pilot-rating-value">0.00</div>
+                            </div>
+                            <div class="rating-desc" id="rating-desc">Анализ...</div>
+                        </div>
+                    </div>
+                    <!-- КОНЕЦ ПРЕМИУМ-КАРТОЧКИ -->
+                    <div class="glass-panel ai-coach-box">
+                        <div class="ai-header">🧠 ИИ-Аналитик</div>
+                        <div id="ai-initial-state" class="ai-state-box">
+                            <p class="ai-prompt-text">Узнай правду о своей игре и получи советы.</p>
+                            <button id="ai-trigger-btn" class="glow-btn">Сгенерировать разбор</button>
+                        </div>
+                        <div id="ai-loading-state" class="ai-state-box hidden">
+                            <div class="cyber-pulse"></div>
+                            <p class="ai-loading-text">Нейросеть изучает маппул...</p>
+                        </div>
+                        <div id="ai-result-state" class="ai-state-box hidden">
+                            <div id="ai-advice-text"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Правая колонка -->
+                <div class="right-col">
+                    <div class="glass-panel sector">
+                        <h3 class="sector-title">Глобальная статистика (Детальная)</h3>
+                        <div class="stats-grid-extended">
+                            <div class="stat-mini"><span>K/D (Avg)</span><strong id="kd-ratio">-</strong></div>
+                            <div class="stat-mini"><span>Winrate</span><strong id="win-rate">-</strong></div>
+                            <div class="stat-mini"><span>Матчи</span><strong id="total-matches">-</strong></div>
+                            <div class="stat-mini"><span>Победы</span><strong id="total-wins">-</strong></div>
+                            <div class="stat-mini"><span>HS %</span><strong id="hs-percent">-</strong></div>
+                            <div class="stat-mini"><span>K/R Ratio</span><strong id="kr-ratio">-</strong></div>
+                            <div class="stat-mini"><span>Стрик (Тек.)</span><strong id="win-streak">-</strong></div>
+                            <div class="stat-mini"><span>Стрик (Макс)</span><strong id="longest-streak">-</strong></div>
+                            <div class="stat-mini"><span>Всего Kills</span><strong id="total-kills">-</strong></div>
+                            <div class="stat-mini"><span>Всего Deaths</span><strong id="total-deaths">-</strong></div>
+                            <div class="stat-mini"><span>Всего HS</span><strong id="total-hs">-</strong></div>
+                            <div class="stat-mini"><span>Раунды</span><strong id="total-rounds">-</strong></div>
+                        </div>
+                    </div>
+                    <div class="glass-panel sector advanced-sector">
+                        <div class="advanced-heading">
+                            <div>
+                                <h3 class="sector-title">Расширенная аналитика</h3>
+                                <p>Показатели импакта, clutch и utility из FACEIT API.</p>
+                            </div>
+                            <span class="data-badge">API / CS2</span>
+                        </div>
+                        <div class="advanced-stats-grid">
+                            <div class="stat-mini metric-accent"><span>ADR</span><strong id="adr-stat">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>Entry Rate</span><strong id="entry-rate">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>Entry Success</span><strong id="entry-success">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>1v1 Clutch</span><strong id="clutch-1v1">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>1v2 Clutch</span><strong id="clutch-1v2">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>Flash Success</span><strong id="flash-success">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>Enemies / Flash</span><strong id="enemies-flashed-round">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>Flashes / Round</span><strong id="flashes-round">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>Utility / Round</span><strong id="utility-round">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>Utility Success</span><strong id="utility-success">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>Sniper Rate</span><strong id="sniper-rate">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>Total Utility DMG</span><strong id="utility-damage">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>1v1 Wins</span><strong id="clutch-1v1-wins">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>1v2 Wins</span><strong id="clutch-1v2-wins">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>Entry Wins</span><strong id="entry-wins">-</strong></div>
+                            <div class="stat-mini metric-accent"><span>Flash Successes</span><strong id="flash-success-count">-</strong></div>
+                        </div>
+                    </div>
+                    <div class="glass-panel sector">
+                        <h3 class="sector-title">Сигнатурные карты (Топ-3)</h3>
+                        <div class="maps-grid" id="maps-container"></div>
+                    </div>
+                    <div class="glass-panel sector">
+                        <h3 class="sector-title">Форма (Последние 5 игр)</h3>
+                        <div class="recent-matches" id="recent-matches"></div>
+                    </div>
+
+                    <div class="glass-panel sector elo-sector">
+                        <h3 class="sector-title">Динамика ELO (Последние 25 матчей)</h3>
+                        <div class="elo-stats-summary" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                            <div class="stat-mini"><span>Максимум</span><strong id="elo-max" style="color: #10b981;">-</strong></div>
+                            <div class="stat-mini"><span>Минимум</span><strong id="elo-min" style="color: #ef4444;">-</strong></div>
+                            <div class="stat-mini"><span>Разница</span><strong id="elo-diff">-</strong></div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="eloChart"></canvas>
+                        </div>
+                    </div>
+
+                        <button id="view-history-btn" class="glow-btn" style="margin-top: 20px; width: 100%;">Посмотреть историю матчей</button>
+                    </div>
+                </div>
+            </div>
+
+        <!-- 3. ИСТОРИЯ МАТЧЕЙ -->
+        <div id="history-section" class="hidden history-screen">
+            <div class="history-topbar">
+                <button id="back-to-stats-btn" class="icon-btn">← Назад к профилю</button>
+                <span class="history-live"><i></i> MATCH CENTER / 25</span>
+            </div>
+            <div class="history-heading">
+                <div>
+                    <span class="history-eyebrow">PERFORMANCE LOG</span>
+                    <h2>История матчей</h2>
+                    <p>Разбор последних игр, карта за картой.</p>
+                </div>
+                <div class="history-count"><strong>25</strong><span>GAMES</span></div>
+            </div>
+            <div id="matches-list" class="matches-list">
+                <!-- Список сгенерируется через JS -->
+            </div>
+        </div>
+
+        <!-- 4. СКОРБОРД МАТЧА -->
+        <div id="match-section" class="hidden match-screen">
+            <div class="match-topbar">
+                <button id="back-to-history-btn" class="icon-btn">← Назад к истории</button>
+                <span class="history-live"><i></i> MATCH REPORT / LIVE DATA</span>
+            </div>
+            <div id="match-header" class="match-hero">
+                <img id="match-map-image" class="match-map-image" alt="Карта матча">
+                <div class="match-hero-overlay"></div>
+                <div class="match-hero-content">
+                <span class="history-eyebrow">MATCH REPORT</span>
+                <h2 id="match-score">0 : 0</h2>
+                <p id="match-map">Карта</p>
+                <div class="match-meta-row">
+                    <span id="match-region">EU</span>
+                    <span id="match-rounds">0 ROUNDS</span>
+                    <span id="match-mode">5V5</span>
+                </div>
+                </div>
+            </div>
+            <div id="scoreboard-container" class="scoreboard-container">
+                <!-- Таблицы сгенерируются через JS -->
+            </div>
+        </div>
+
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
